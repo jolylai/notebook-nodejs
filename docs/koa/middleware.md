@@ -7,32 +7,32 @@
 ```js
 app.use(async (ctx, next) => {
   await next();
-  const rt = ctx.response.get("X-Response-Time");
+  const rt = ctx.response.get('X-Response-Time');
   console.log(`${ctx.method} ${ctx.url} - ${rt}`);
 });
 ```
 
 ## 洋葱模型
 
-![The onion model](https://i.loli.net/2019/12/31/vWKldkAFD837tEw.jpg)
+![](https://i.loli.net/2019/12/31/vWKldkAFD837tEw.jpg)
 
 ### 洋葱模型如何工作
 
 ```js {}
-const Koa = require("koa");
+const Koa = require('koa');
 const app = new Koa();
 
 // logger
 app.use(async (ctx, next) => {
   // 1
   // 日志打印开始
-  console.log("logger start");
+  console.log('logger start');
 
   // 等待后一个中间件执行
   await next();
   // 4
   // 后面的中间件执行完成才会执行下面的代码
-  const rt = ctx.response.get("X-Response-Time");
+  const rt = ctx.response.get('X-Response-Time');
   console.log(`${ctx.method} ${ctx.url} - ${rt}`);
 });
 
@@ -48,12 +48,12 @@ app.use(async (ctx, next) => {
   // 3
   // 后面的中间件执行完成才会执行下面的代码
   const ms = Date.now() - start;
-  ctx.set("X-Response-Time", `${ms}ms`);
+  ctx.set('X-Response-Time', `${ms}ms`);
 });
 
 // response
 app.use(async ctx => {
-  ctx.body = "Hello World";
+  ctx.body = 'Hello World';
 });
 
 app.listen(3000);
@@ -86,7 +86,7 @@ function compose(middleware) {
     let index = -1;
     function dispatch(i) {
       if (i <= index)
-        return Promise.reject(new Error("next() called multiple times"));
+        return Promise.reject(new Error('next() called multiple times'));
       index = i;
       let fn = middleware[i];
       if (i === middleware.length) fn = next;
@@ -98,7 +98,6 @@ function compose(middleware) {
       }
     }
     return dispatch(0);
-
   };
 }
 ```

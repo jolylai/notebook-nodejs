@@ -1,6 +1,6 @@
 ---
 hero:
-  title: NodeJS
+  title: Node.js
   desc: 全栈起航
   actions:
     - text: Getting Started
@@ -18,7 +18,10 @@ features:
 footer: Copyright © 2020
 ---
 
+用实际项目去学习
+
 ## 资料
 
+- [Koa](https://koa.bootcss.com/#context)
 - [网易云音乐 API](https://binaryify.github.io/NeteaseCloudMusicApi/#/)
 - [Lin](http://doc.mini.7yue.pro/)
