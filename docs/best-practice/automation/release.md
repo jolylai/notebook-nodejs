@@ -1,22 +1,51 @@
 ---
-title: 打包
+title: 自定义CLI
 ---
 
 ## 前言
+
+自定义 CLI 可以大大提高工作效率，比如给一个 git 分支打 Tag 时我们需要使用以下命令
+
+```shell
+git tag -a v-1.0.0 -m message
+git push origin v-1.0.0
+```
+
+而通过封装一个 CLI 后，只需要使用一下命令
 
 ```shell
 yarn release -v 1.0.0
 ```
 
-## 获取版本号
+## 1.获取命令行的参数
+
+[minimist](https://github.com/substack/minimist): This module is the guts of optimist's argument parser without all the fanciful decoration.
+
+```shell
+yarn add minimist execa -D
+```
+
+创建 `example/parse.js`文件
+
+```js
+var argv = require('minimist')(process.argv.slice(2));
+console.log(argv);
+```
+
+执行命令行
+
+```shell
+node example/parse.js -a beep -b boop
+{ _: [], a: 'beep', b: 'boop' }
+```
+
+## 2. 命令提示工具
 
 ```shell
 yarn add enquirer minimist execa -D
 ```
 
-- [enquirer](https://github.com/enquirer/enquirer):Stylish CLI prompts that are user-friendly, intuitive and easy to create.
-- [execa](https://github.com/sindresorhus/execa): Process execution for humans
-- [minimist](https://github.com/substack/minimist): This module is the guts of optimist's argument parser without all the fanciful decoration.
+> [enquirer](https://github.com/enquirer/enquirer):Stylish CLI prompts that are user-friendly, intuitive and easy to create.
 
 ```js
 const { prompt } = require('enquirer');
@@ -35,7 +64,9 @@ const targetVersion = args.v;
 })();
 ```
 
-## 执行测试案例并打包
+## 3. 执行 Script
+
+### 执行测试案例并打包
 
 ```js
 const { prompt } = require('enquirer');
@@ -58,7 +89,7 @@ const run = (bin, args, opts = {}) =>
 })();
 ```
 
-## 更新依赖
+### 更新依赖
 
 使用 workspace 管理包的时候 才需要打包时更新包依赖
 
@@ -104,7 +135,7 @@ function updateDeps(packageJson, depType, version) {
 }
 ```
 
-## 提交变更
+### 提交变更
 
 ```js
 const execa = require('execa');
@@ -130,7 +161,7 @@ const run = (bin, args, opts = {}) =>
 })();
 ```
 
-## 发布 npm 包
+### 发布 npm 包
 
 [yarn publish](https://classic.yarnpkg.com/en/docs/cli/publish/),发布包到 npm 仓库
 
@@ -168,7 +199,7 @@ const run = (bin, args, opts = {}) =>
 })();
 ```
 
-## 打 tag 包
+### 打 Tag
 
 ```js
 const chalk = require('chalk');
@@ -196,31 +227,5 @@ const run = (bin, args, opts = {}) =>
 ```
 
 `.github/workflow/release` [create-release](https://github.com/actions/create-release)
-
-```yml
-on:
-  push:
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-
-name: Create Release
-
-jobs:
-  build:
-    name: Create Release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@master
-      - name: Create Release for Tag
-        id: release_tag
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          body: |
-            Please refer to [CHANGELOG.md](https://github.com/kkbjs/element3/blob/master/CHANGELOG.md) for details.
-```
 
 完整脚本代码可以查看 [element3](https://github.com/hug-sun/element3/blob/master/scripts/release.js)
