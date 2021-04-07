@@ -233,58 +233,23 @@ git tag -a v-1.0.0 -m message
 git push origin v-1.0.0
 ```
 
-#### 更新依赖
-
-使用 workspace 管理包的时候 才需要打包时更新包依赖
-
-```js
-const path = require('path');
-const chalk = require('chalk');
-
-const step = msg => console.log(chalk.cyan(msg));
-
-(async function main() {
-  step('\nUpdating element3 cross dependencies...');
-  updatePackageVersion(targetVersion);
-})();
-
-function updatePackageVersion(version) {
-  getPackagePath().forEach(pkgPath => {
-    const pkg = JSON.parse(fs.readFileSync(pkgPath));
-    updateDeps(pkg, 'dependencies', version);
-    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-  });
-}
-
-function getPackagePath() {
-  const pkgRoot = path.resolve(__dirname, '../packages');
-  const packages = fs
-    .readdirSync(pkgRoot)
-    .filter(name => !name.startsWith('.'));
-
-  return packages.map(packageName =>
-    path.resolve(pkgRoot, packageName, 'package.json'),
-  );
-}
-
-function updateDeps(packageJson, depType, version) {
-  const dependencies = packageJson[depType];
-  if (!dependencies) return;
-
-  Object.keys(dependencies).forEach(key => {
-    if (key === 'element3') {
-      dependencies[key] = version;
-    }
-  });
-}
-```
-
 ## 完整脚本
 
 安装依赖
 
 ```shell
-yarn add semver prompt minimist execa chalk -D
+yarn add semver prompt minimist execa chalk conventional-changelog-cli -D
+```
+
+配置 `package.json`
+
+```json
+{
+  "scripts": {
+    "release": "node scripts/release.js",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
+  }
+}
 ```
 
 完整脚本代码
