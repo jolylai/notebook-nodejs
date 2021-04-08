@@ -38,7 +38,7 @@ docs-dist/umi.css      84.8 KB                   20.5 KB
 
 最终我们可以得到 `docs-dist` 文件夹，只需要把这个文件夹里的文件上传到`gh-pages`分支上就可以了
 
-## 手动部署
+### 手动部署
 
 将代码提交到远程仓库 gh-pages 分支
 
@@ -71,7 +71,7 @@ yarn add gh-pages -D
 yarn run docs:deploy
 ```
 
-## Github Actions 自动部署
+### 自动部署
 
 创建`.github/workflows/deploy.yml`
 
@@ -111,38 +111,6 @@ jobs:
 
 代码提交到 Github 仓库时，使用 Travis 自动执行打包，并将`docs-dist`部署到 gh-pages 中
 
-## Travis 自动部署
-
-### 生成 github tocken
-
-按照[创建 Token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line)创建一个 Token ，并添加到 Travis 的环境变量中，部署中将使用到
-
-### travis 配置
-
-在项目的根路径中创建 `.travis.yml`
-
-```yaml
-language: node_js
-node_js: stable
-cache:
-  directories: node_modules
-branches:
-  only:
-    - master
-install:
-  - yarn install
-script:
-  - yarn run docs:build
-deploy:
-  provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN
-  keep-history: true
-  local_dir: docs-dist
-  on:
-    branch: master
-```
-
 ## 钉钉通知
 
 ```yml
@@ -169,4 +137,63 @@ jobs:
                   "text": "# [${{github.event.release.tag_name}}](${{github.event.release.html_url}}) released:\n${{github.event.release.body}}"
               }
             }
+```
+
+## 发布版本
+
+`.github/workflows/release-tag.yml`
+
+```yml
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Create Release for Tag
+        id: release_tag
+        uses: yyx990803/release-tag@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          body: |
+            Please refer to [CHANGELOG.md](https://github.com/vuejs/vue-next/blob/master/CHANGELOG.md) for details.
+```
+
+## 文件大小检查
+
+`.github/workflows/size-check.yml`
+
+```yml
+name: 'size'
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  size:
+    runs-on: ubuntu-latest
+    env:
+      CI_JOB_NUMBER: 1
+    steps:
+      - uses: actions/checkout@v1
+      - uses: bahmutov/npm-install@v1
+
+      - uses: posva/size-check-action@v1.1.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          build_script: size
+          files: packages/vue/dist/vue.global.prod.js packages/runtime-dom/dist/runtime-dom.global.prod.js packages/size-check/dist/size-check.global.prod.js
 ```

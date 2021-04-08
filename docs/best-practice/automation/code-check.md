@@ -188,7 +188,9 @@ yarn prettier --write app/
 yarn prettier --write app/components/Button.js
 
 # 格式化所有匹配到的文件
-yarn prettier --write "app/**/*.test.js
+yarn prettier --write "app/**/*.test.js"
+
+prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"
 ```
 
 ## Eslint

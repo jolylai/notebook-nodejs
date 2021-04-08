@@ -2,7 +2,7 @@
 title: 快速开始
 order: 1
 group:
-  title: Docker容器化基础
+  title: Docker容器化
 ---
 
 ## 架构图

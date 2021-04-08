@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "scripts": {
     "start": "dumi dev",
-    "commit": "git add . && git cz && git push",
     "docs:build": "dumi build",
     "docs:deploy": "gh-pages -d docs-dist",
     "build": "father-build",
