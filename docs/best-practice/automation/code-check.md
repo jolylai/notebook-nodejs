@@ -1,5 +1,5 @@
 ---
-title: 规范检查
+title: 代码规范检查
 group:
   title: 自动化
   order: 2
@@ -7,19 +7,139 @@ group:
 
 ## 前言
 
+将代码提交到远程仓库前对提交的代码进行检查，如果符合规范，则可进行提交，如果不符合规范则不允许提交到远程仓库，
+这样才能确保远程仓库的代码都是风格一致的代码
+
+## 代码规格式化
+
+在提交 `git` 之前，我们需要校验我们的代码是否符合规范，如果不符合，则不允许提交代码。
+
+首先，安装依赖：
+
+```shell
+yarn add yorkie lint-staged -D
+```
+
+- [yorkie](https://github.com/yyx990803/yorkie)
+
+配置 `package.json`
+
+```json
+{
+  "gitHooks": {
+    "pre-commit": "lint-staged",
+    "commit-msg": "node script/verify-commit.js",
+    "pre-push": "npm test"
+  },
+  "lint-staged": {
+    "*.{js,vue}": ["eslint", "prettier --write"],
+    "*.ts?(x)": ["eslint", "prettier --parser=typescript --write"]
+  }
+}
+```
+
+在 `git commit` 之前会进入工作区文件的扫描，执行 `prettier` 脚本，修改 `eslint` 问题，然后重要提交到工作区。
+
+常用的 `git` 钩子的含义：
+
+1. `"pre-commit": "lint-staged"`，在 `git commit` 前执行检查代码格式。
+2. `"commit-msg": "node script/verify-commit.js"`，在 `git commit` 时执行脚本 `verify-commit.js` 验证 `commit` 消息。如果不符合脚本中定义的格式，将会报错。
+3. `"pre-push": "npm test"`，在你执行 `git push` 将代码推送到远程仓库前，执行 `npm test` 进行测试。如果测试失败，将不会执行这次推送。
+
+创建 `.prettierrc`
+
+```
+semi: false
+singleQuote: true
+printWidth: 80
+```
+
+## 提交信息检查
+
+### 自定义效验检查提
+
+创建 `/scripts/verifyCommit.js` 交信息规范
+
+```js
+// Invoked on the commit-msg git hook by yorkie.
+
+const chalk = require('chalk');
+const msgPath = process.env.GIT_PARAMS;
+const msg = require('fs')
+  .readFileSync(msgPath, 'utf-8')
+  .trim();
+
+const commitRE = /^(revert: )?(feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release)(\(.+\))?: .{1,50}/;
+
+if (!commitRE.test(msg)) {
+  console.log();
+  console.error(
+    `  ${chalk.bgRed.white(' ERROR ')} ${chalk.red(
+      `invalid commit message format.`,
+    )}\n\n` +
+      chalk.red(
+        `  Proper commit message format is required for automated changelog generation. Examples:\n\n`,
+      ) +
+      `    ${chalk.green(`feat(compiler): add 'comments' option`)}\n` +
+      `    ${chalk.green(
+        `fix(v-model): handle events on blur (close #28)`,
+      )}\n\n` +
+      chalk.red(`  See .github/commit-convention.md for more details.\n`),
+  );
+  process.exit(1);
+}
+```
+
+配置 `package.json`
+
+```json
+{
+  "gitHooks": {
+    "commit-msg": "node scripts/verifyCommit.js"
+  }
+}
+```
+
+### Commitizen 校验
+
+检验提交的说明是否符合规范，不符合则不可以提交
+
+```shell
+yarn add -D @commitlint/cli
+
+// 安装符合Angular风格的校验规则
+yarn add -D @commitlint/config-conventional
+```
+
+在根目录下创建 `commitlint.config.js` 并配置检验：
+
+```js
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+};
+```
+
+然后在 `package.json` 中配置 `gitHooks`
+
+```json
+{
+  "gitHooks": {
+    "commit-msg": "commitlint -E GIT_PARAMS"
+  }
+}
+```
+
 ## Prettier
 
 [`Prettier`](https://prettier.io/) 是一个代码格式化的工具。
 
-### 安装使用
+安装使用
 
 ```shell
 yarn add prettier -D
 ```
 
-### 配置文件
-
-创建 `.prettierrc` 文件，配置 `Prettier` 如何格式化代码 ，以下是常用配置，更多配置可以查看[](https://prettier.io/docs/en/options.html)
+创建 `.prettierrc` 文件，配置 `Prettier` 如何格式化代码 ，以下是常用配置，更多配置可以[查看](https://prettier.io/docs/en/options.html)
 
 ```json
 {
@@ -55,7 +175,7 @@ package.json
 .umi-test
 ```
 
-### 命令行
+命令行
 
 ```shell
 # 格式化所有文件
@@ -73,16 +193,12 @@ yarn prettier --write "app/**/*.test.js
 
 ## Eslint
 
-### 安装使用
-
 安装 `eslint`
 
 ```shell
 yarn add eslint -D
 yarn run eslint --init
 ```
-
-### 配置文件
 
 创建 `.eslintrc`, 配置 `eslint` 如何效验代码
 
@@ -115,8 +231,6 @@ yarn run eslint --init
 4.  IDE
 5.  环境配置
 
-### 命令行
-
 使用命令行检查文件代码
 
 ```shell
@@ -127,7 +241,7 @@ yarn eslint .
 
 EditorConfig 有助于维护跨多个编辑器和 IDE 从事同一项目的多个开发人员的一致编码风格，团队必备神器。
 
-### .editorconfig 文件
+`.editorconfig` 文件
 
 ```
 # EditorConfig is awesome: https://EditorConfig.org
@@ -190,138 +304,6 @@ insert_final_newline      设为true表示使文件以一个空白行结尾
 root           表示是最顶层的配置文件，发现设为true时，才会停止查找.editorconfig文件
 ```
 
-## 代码规范效验
-
-在提交 `git` 之前，我们需要校验我们的代码是否符合规范，如果不符合，则不允许提交代码。
-
-首先，安装依赖：
-
-```shell
-yarn add yorkie lint-staged -D
-```
-
-`package.json`
-
-```json
-{
-  "gitHooks": {
-    "pre-commit": "lint-staged",
-    "commit-msg": "node script/verify-commit.js",
-    "pre-push": "npm test"
-  },
-  "lint-staged": {
-    "*.{js,vue}": ["eslint", "prettier --write"],
-    "*.ts?(x)": ["eslint", "prettier --parser=typescript --write"]
-  }
-}
-```
-
-在 `git commit` 之前会进入 工作区文件的扫描，执行 `prettier` 脚本，修改 `eslint` 问题，然后重要提交到工作区。
-
-常用的 `git` 钩子的含义：
-
-1. `"pre-commit": "lint-staged"`，在 `git commit` 前执行检查代码格式。
-2. `"commit-msg": "node script/verify-commit.js"`，在 `git commit` 时执行脚本 `verify-commit.js` 验证 `commit` 消息。如果不符合脚本中定义的格式，将会报错。
-3. `"pre-push": "npm test"`，在你执行 `git push` 将代码推送到远程仓库前，执行 `npm test` 进行测试。如果测试失败，将不会执行这次推送。
-
-## 提交信息检查
-
-### 自定义效验
-
-创建 `/scripts/verifyCommit.js` 检查提交信息规范
-
-```js
-// Invoked on the commit-msg git hook by yorkie.
-
-const chalk = require('chalk');
-const msgPath = process.env.GIT_PARAMS;
-const msg = require('fs')
-  .readFileSync(msgPath, 'utf-8')
-  .trim();
-
-const commitRE = /^(revert: )?(feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release)(\(.+\))?(.{1,10})?: .{1,50}/;
-const mergeRe = /^(Merge pull request|Merge branch)/;
-
-if (!commitRE.test(msg)) {
-  if (!mergeRe.test(msg)) {
-    console.log(msg);
-    console.error(
-      `  ${chalk.bgRed.white(' ERROR ')} ${chalk.red(
-        `invalid commit message format.`,
-      )}\n\n` +
-        chalk.red(
-          `  Proper commit message format is required for automated changelog generation. Examples:\n\n`,
-        ) +
-        `    ${chalk.green(`feat(compiler): add 'comments' option`)}\n` +
-        `    ${chalk.green(
-          `fix(v-model): handle events on blur (close #28)`,
-        )}\n\n` +
-        chalk.red(
-          `  See https://github.com/vuejs/vue-next/blob/master/.github/commit-convention.md for more details.\n`,
-        ),
-    );
-    process.exit(1);
-  }
-}
-```
-
-配置 `package.json`
-
-```json
-{
-  "gitHooks": {
-    "commit-msg": "node scripts/verifyCommit.js"
-  }
-}
-```
-
-### Commitizen 校验
-
-检验提交的说明是否符合规范，不符合则不可以提交
-
-```shell
-yarn add -D @commitlint/cli
-
-// 安装符合Angular风格的校验规则
-yarn add -D @commitlint/config-conventional
-```
-
-在根目录下创建 `commitlint.config.js` 并配置检验：
-
-```js
-module.exports = {
-  extends: ['@commitlint/config-conventional'],
-};
-```
-
-然后在 `package.json` 中配置 `gitHooks`
-
-```json
-{
-  "gitHooks": {
-    "commit-msg": "commitlint -E GIT_PARAMS"
-  }
-}
-```
-
-## 生成更新日志
-
-安装 [conventional-changelog-cli](https://github.com/conventional-changelog/conventional-changelog)
-
-```shell
-yarn add conventional-changelog-cli -D
-```
-
-配置 `package.json`
-
-```json
-{
-  "scripts": {
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
-  }
-}
-```
-
-#### 参考资料
+#### Reference
 
 - [一套标准的前端代码工作流](https://mp.weixin.qq.com/s/YI5_E4JJAb6Xu0kZgkjabQ)

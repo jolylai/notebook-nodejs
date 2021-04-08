@@ -115,7 +115,7 @@ yarn add execa chalk -D
 
 ## 生成 CHNAGELOG
 
-安装依赖
+安装 [conventional-changelog-cli](https://github.com/conventional-changelog/conventional-changelog)
 
 ```shell
 yarn add conventional-changelog-cli -D
@@ -129,6 +129,12 @@ yarn add conventional-changelog-cli -D
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   }
 }
+```
+
+执行以下命名就会在根目录根据 git 提价信息自动生成 `CHANGELOG.md` 文件`
+
+```shell
+yarn run changelog
 ```
 
 ## 提交变更
