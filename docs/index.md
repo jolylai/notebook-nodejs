@@ -24,3 +24,4 @@ footer: Copyright © 2020
 - [Nodejs 文档](http://nodejs.cn/api/fs.html)
 - [Koa](https://koa.bootcss.com/#context)
 - [网易云音乐 API](https://binaryify.github.io/NeteaseCloudMusicApi/#/)
+- [廖雪峰 Node.js](https://www.liaoxuefeng.com/wiki/1022910821149312/1023025830950720)
