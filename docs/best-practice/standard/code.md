@@ -4,7 +4,7 @@ group:
   title: 开发规范
   order: 1
 nav:
-  title: 最佳实践
+  title: 实践
 ---
 
 ## 项目目录结构
