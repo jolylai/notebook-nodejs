@@ -2,6 +2,8 @@
 title: Rollup 打包
 ---
 
+##
+
 ```json
 {
   "main": "dist/cjs.js",
@@ -26,6 +28,9 @@ yarn add @rollup/plugin-babel -D
 **Rollup Plugin Peer Deps External**
 
 Automatically externalize peerDependencies in a rollup bundle.
+
+[rollup-plugin-terser](https://github.com/TrySound/rollup-plugin-terser)
+代码压缩插件
 
 ## 配置文件
 
@@ -105,6 +110,64 @@ export default {
   - `amd` – 异步模块定义，用于像 RequireJS 这样的模块加载器
   - `iife` – 一个自动执行的功能，适合作为`<script>`标签。（如果要为应用程序创建一个捆绑包，您可能想要使用它，因为它会使文件大小变小。）
   - `system` - SystemJS 加载器格式
+
+### cjs
+
+```js
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const add = (a, b) => a + b;
+
+exports.add = add;
+```
+
+### esm
+
+```js
+const add = (a, b) => a + b;
+
+export { add };
+```
+
+### iife
+
+```js
+var math = (function(exports) {
+  'use strict';
+
+  const add = (a, b) => a + b;
+
+  exports.add = add;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+  return exports;
+})({});
+```
+
+### umd
+
+```js
+(function(global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined'
+    ? factory(exports)
+    : typeof define === 'function' && define.amd
+    ? define(['exports'], factory)
+    : ((global =
+        typeof globalThis !== 'undefined' ? globalThis : global || self),
+      factory((global.math = {})));
+})(this, function(exports) {
+  'use strict';
+
+  const add = (a, b) => a + b;
+
+  exports.add = add;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+});
+```
 
 ## 插件
 
