@@ -13,8 +13,8 @@ try {
 const imgPath = resolve(__dirname, './jucy-beef-burger.jpg');
 
 try {
-  const data = fs.readFileSync(imgPath);
-  console.log('data: ', data);
+  const buffer = fs.readFileSync(imgPath);
+  console.log('buffer: ', buffer);
 } catch (err) {
   // 出错了
 }
