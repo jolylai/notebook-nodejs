@@ -28,7 +28,7 @@ yarn add yorkie lint-staged -D
 {
   "gitHooks": {
     "pre-commit": "lint-staged",
-    "commit-msg": "node script/verify-commit.js",
+    "commit-msg": "node scripts/verify-commit.js",
     "pre-push": "npm test"
   },
   "lint-staged": {
