@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Upload</title>
+</head>
+<body>
+  <form name="user" method="POST" action="http://localhost:3000" enctype="application/x-www-form-urlencoded">
+    <input name="name" />
+    <button type="submit">提交</button>
+  </form>
+
+  <script>
+    const form =  document.forms['user']
+
+    function onSubmit(event){
+      console.log('event: ', event.target.value);
+      // event.preventDefault()
+
+      // const xhr = new XMLHttpRequest()
+
+
+      // xhr.open('POST', 'http://localhost:3000', true)
+
+      // xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded' )
+
+      // const data = JSON.stringify({name: 'jack'})
+
+      // xhr.send(data)
+    }
+    
+    form.addEventListener('submit', onSubmit, false)
+  </script>
+</body>
+</html>
+
