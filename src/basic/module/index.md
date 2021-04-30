@@ -97,3 +97,7 @@ CommonJS 模块规范也允许在标识符中不包含文件扩展名，这种�
 如果 `main` 属性指定的文件名错误，或者压根没有 `package.json` 文件，Node 会将 `index` 当做默认文件名，然后依次查找 `index.js`、`index.json`、`index.node`。
 
 如果在目录分析的过程中没有定位成功任何文件，则自定义模块进入下一个模块路径进行查找。如果模块路径数组都被遍历完毕，依然没有查找到目标文件，则会抛出查找失败的异常。
+
+#### Reference
+
+[How the module system, CommonJS & require works](https://blog.risingstack.com/node-js-at-scale-module-system-commonjs-require/)

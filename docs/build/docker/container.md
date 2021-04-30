@@ -1,9 +1,45 @@
 ---
 title: 容器
-order: 3
+order: 2
 ---
 
-## 创建
+## 运行容器
+
+```shell
+docker <object> <command> <options>
+```
+
+使用以下语法：
+
+- `object`: 表示将要操作的 Docker 对象的类型。这可以是 `container`、`image`、`network` 或者 `volume` 对象。
+- `command`: 表示守护程序要执行的任务，即 `run` 命令。
+- `options`: 可以是任何可以覆盖命令默认行为的有效参数，例如端口映射的 `--publish` 选项。
+
+#### 公开端口
+
+```shell
+$ docker container run -p 8080:80 fhsinchy/hello-dock
+Unable to find image 'fhsinchy/hello-dock:latest' locally
+latest: Pulling from fhsinchy/hello-dock
+0a6724ff3fcd: Pull complete
+1d7c87af3754: Pull complete
+9668ffa91d19: Pull complete
+e81a2f5037c1: Pull complete
+991b5ddb4d9e: Pull complete
+9f4fab0aaa1b: Pull complete
+Digest: sha256:852a90695e942a8aefe5883cb9681a3fbedfdf89f64468e22fa30e04766e5f2e
+Status: Downloaded newer image for fhsinchy/hello-dock:latest
+```
+
+#### 分离模式
+
+```shell
+$ docker container run --detach -p 8080:80 fhsinchy/hello-dock
+
+#
+$ docker container run -d -p 8080:80 fhsinchy/hello-dock
+32b55add608ab122f170d51aab9394aeed963a9419a4a9c7a3232cf3e79bbca3
+```
 
 ```shell
 # 只创建容器
@@ -89,209 +125,6 @@ docker logs -tf -tail 10 容器id
 
 查看镜像元数据
 
-```shell
-$ docker inspect 33dd05bad49b
-[
-    {
-        "Id": "33dd05bad49b9b2f4a331e7746bb540a41e150ec0b82ca5d40219aa2d5573f29",
-        "Created": "2020-05-20T08:48:53.443385321Z",
-        "Path": "nginx",
-        "Args": [
-            "-g",
-            "daemon off;"
-        ],
-        "State": {
-            "Status": "running",
-            "Running": true,
-            "Paused": false,
-            "Restarting": false,
-            "OOMKilled": false,
-            "Dead": false,
-            "Pid": 28262,
-            "ExitCode": 0,
-            "Error": "",
-            "StartedAt": "2020-05-20T08:48:53.676279216Z",
-            "FinishedAt": "0001-01-01T00:00:00Z"
-        },
-        "Image": "sha256:a00be011f00a1da2aefacca299a210eebe8e643ab95bd5a7274bdd8831255254",
-        "ResolvConfPath": "/var/lib/docker/containers/33dd05bad49b9b2f4a331e7746bb540a41e150ec0b82ca5d40219aa2d5573f29/resolv.conf",
-        "HostnamePath": "/var/lib/docker/containers/33dd05bad49b9b2f4a331e7746bb540a41e150ec0b82ca5d40219aa2d5573f29/hostname",
-        "HostsPath": "/var/lib/docker/containers/33dd05bad49b9b2f4a331e7746bb540a41e150ec0b82ca5d40219aa2d5573f29/hosts",
-        "LogPath": "",
-        "Name": "/suspicious_yonath",
-        "RestartCount": 0,
-        "Driver": "overlay2",
-        "MountLabel": "",
-        "ProcessLabel": "",
-        "AppArmorProfile": "",
-        "ExecIDs": null,
-        "HostConfig": {
-            "Binds": null,
-            "ContainerIDFile": "",
-            "LogConfig": {
-                "Type": "journald",
-                "Config": {}
-            },
-            "NetworkMode": "default",
-            "PortBindings": {
-                "80/tcp": [
-                    {
-                        "HostIp": "",
-                        "HostPort": "80"
-                    }
-                ]
-            },
-            "RestartPolicy": {
-                "Name": "no",
-                "MaximumRetryCount": 0
-            },
-            "AutoRemove": false,
-            "VolumeDriver": "",
-            "VolumesFrom": null,
-            "CapAdd": null,
-            "CapDrop": null,
-            "Dns": [],
-            "DnsOptions": [],
-            "DnsSearch": [],
-            "ExtraHosts": null,
-            "GroupAdd": null,
-            "IpcMode": "",
-            "Cgroup": "",
-            "Links": null,
-            "OomScoreAdj": 0,
-            "PidMode": "",
-            "Privileged": false,
-            "PublishAllPorts": false,
-            "ReadonlyRootfs": false,
-            "SecurityOpt": null,
-            "UTSMode": "",
-            "UsernsMode": "",
-            "ShmSize": 67108864,
-            "Runtime": "docker-runc",
-            "ConsoleSize": [
-                0,
-                0
-            ],
-            "Isolation": "",
-            "CpuShares": 0,
-            "Memory": 0,
-            "NanoCpus": 0,
-            "CgroupParent": "",
-            "BlkioWeight": 0,
-            "BlkioWeightDevice": null,
-            "BlkioDeviceReadBps": null,
-            "BlkioDeviceWriteBps": null,
-            "BlkioDeviceReadIOps": null,
-            "BlkioDeviceWriteIOps": null,
-            "CpuPeriod": 0,
-            "CpuQuota": 0,
-            "CpuRealtimePeriod": 0,
-            "CpuRealtimeRuntime": 0,
-            "CpusetCpus": "",
-            "CpusetMems": "",
-            "Devices": [],
-            "DiskQuota": 0,
-            "KernelMemory": 0,
-            "MemoryReservation": 0,
-            "MemorySwap": 0,
-            "MemorySwappiness": -1,
-            "OomKillDisable": false,
-            "PidsLimit": 0,
-            "Ulimits": null,
-            "CpuCount": 0,
-            "CpuPercent": 0,
-            "IOMaximumIOps": 0,
-            "IOMaximumBandwidth": 0
-        },
-        "GraphDriver": {
-            "Name": "overlay2",
-            "Data": {
-                "LowerDir": "/var/lib/docker/overlay2/7721d11faf86cf9c741b93ffbf4a7e28ce3ff13c087978d5268030d5e5904b73-init/diff:/var/lib/docker/overlay2/45b6662c0db2ffcee7ee370e00625d6827731ab7c00ce6e381f808207bc95b99/diff:/var/lib/docker/overlay2/10763c8cd0e3058d6047fd1563b669613ca1e694627b5067acb0541d47086fc7/diff:/var/lib/docker/overlay2/8931916e6317886ef55876eccc106bf4b08e189e6df0c48224dbe099456c2651/diff:/var/lib/docker/overlay2/64d0daf1a0541ca1fb76d0fc558f32490362416048d0c96100fc36a3b559235a/diff:/var/lib/docker/overlay2/fc0efc2d2ed8e657b59e0363d3bc1359a73128f0075c576ee604714177c81bc1/diff:/var/lib/docker/overlay2/4186e39c8ea1643203b1f7fbae09c1397d92d67c7c8b414ca33841a88cbee99b/diff",
-                "MergedDir": "/var/lib/docker/overlay2/7721d11faf86cf9c741b93ffbf4a7e28ce3ff13c087978d5268030d5e5904b73/merged",
-                "UpperDir": "/var/lib/docker/overlay2/7721d11faf86cf9c741b93ffbf4a7e28ce3ff13c087978d5268030d5e5904b73/diff",
-                "WorkDir": "/var/lib/docker/overlay2/7721d11faf86cf9c741b93ffbf4a7e28ce3ff13c087978d5268030d5e5904b73/work"
-            }
-        },
-        "Mounts": [],
-        "Config": {
-            "Hostname": "33dd05bad49b",
-            "Domainname": "",
-            "User": "",
-            "AttachStdin": false,
-            "AttachStdout": false,
-            "AttachStderr": false,
-            "ExposedPorts": {
-                "80/tcp": {}
-            },
-            "Tty": false,
-            "OpenStdin": false,
-            "StdinOnce": false,
-            "Env": [
-                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                "NGINX_VERSION=1.15.2"
-            ],
-            "Cmd": null,
-            "ArgsEscaped": true,
-            "Image": "a00be011f00a",
-            "Volumes": null,
-            "WorkingDir": "",
-            "Entrypoint": [
-                "nginx",
-                "-g",
-                "daemon off;"
-            ],
-            "OnBuild": null,
-            "Labels": {
-                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
-            },
-            "StopSignal": "SIGTERM"
-        },
-        "NetworkSettings": {
-            "Bridge": "",
-            "SandboxID": "7d3a43d31e7c0f0ccaa73eda5e663716d6b164b53cbf961d92d8cade9f778654",
-            "HairpinMode": false,
-            "LinkLocalIPv6Address": "",
-            "LinkLocalIPv6PrefixLen": 0,
-            "Ports": {
-                "80/tcp": [
-                    {
-                        "HostIp": "0.0.0.0",
-                        "HostPort": "80"
-                    }
-                ]
-            },
-            "SandboxKey": "/var/run/docker/netns/7d3a43d31e7c",
-            "SecondaryIPAddresses": null,
-            "SecondaryIPv6Addresses": null,
-            "EndpointID": "2b9041999d673331037c77b74e1257b6d0edc9244f959b9a67ebaca33348d4ed",
-            "Gateway": "172.17.0.1",
-            "GlobalIPv6Address": "",
-            "GlobalIPv6PrefixLen": 0,
-            "IPAddress": "172.17.0.2",
-            "IPPrefixLen": 16,
-            "IPv6Gateway": "",
-            "MacAddress": "02:42:ac:11:00:02",
-            "Networks": {
-                "bridge": {
-                    "IPAMConfig": null,
-                    "Links": null,
-                    "Aliases": null,
-                    "NetworkID": "b962758317f273281ea8983b7c0b773f0606912988733773fb54ead5f49707da",
-                    "EndpointID": "2b9041999d673331037c77b74e1257b6d0edc9244f959b9a67ebaca33348d4ed",
-                    "Gateway": "172.17.0.1",
-                    "IPAddress": "172.17.0.2",
-                    "IPPrefixLen": 16,
-                    "IPv6Gateway": "",
-                    "GlobalIPv6Address": "",
-                    "GlobalIPv6PrefixLen": 0,
-                    "MacAddress": "02:42:ac:11:00:02"
-                }
-            }
-        }
-    }
-]
-```
-
 ## 容器交互模式
 
 进入容器交互模式
@@ -362,7 +195,18 @@ docker restart 容器id
 ```shell
 # 停止当前正在运行的容器
 $ docker stop [container]
+```
 
+其中 `container identifier` 可以是容器的 ID 或名称。
+
+```shell
+$ docker stop docker-container-name
+docker-container-name
+```
+
+如果使用 `name` 作为标识符，则 `name` 将作为输出返回。`stop` 命令通过发送信号 `SIGTERM` 来正常关闭容器。如果容器在一定时间内没有停止运行，则会发出 `SIGKILL` 信号，该信号会立即关闭容器。
+
+```shell
 # 停用所有的运行中的容器
 $ docker stop $(docker ps -q)
 
@@ -370,7 +214,17 @@ $ docker stop $(docker ps -q)
 $ docker kill [container]
 ```
 
-## 删除
+## 移除挂起的容器
+
+已被停止或终止的容器仍保留在系统中。这些挂起的容器可能会占用空间或与较新的容器发生冲突。
+
+可以使用 `container rm` 命令删除停止的容器。通用语法如下：
+
+```shell
+docker container rm <container identifier>
+```
+
+也可以使用 `container prune` 命令来一次性删除所有挂起的容器。
 
 ```shell
 docker stop $(docker ps -aq)
