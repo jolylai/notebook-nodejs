@@ -3,7 +3,7 @@ title: 容器
 order: 2
 ---
 
-## 运行容器
+## 创建容器
 
 ```shell
 docker <object> <command> <options>
@@ -15,9 +15,15 @@ docker <object> <command> <options>
 - `command`: 表示守护程序要执行的任务，即 `run` 命令。
 - `options`: 可以是任何可以覆盖命令默认行为的有效参数，例如端口映射的 `--publish` 选项。
 
-#### 公开端口
+### 公开端口
+
+容器是隔离的环境。主机系统对容器内部发生的事情一无所知。因此，从外部无法访问在容器内部运行的应用程序。
+
+要允许从容器外部进行访问，必须将容器内的相应端口发布到本地网络上的端口。`--publish` 或 `-p` 选项的通用语法如下：
 
 ```shell
+# --publish <host port>:<container port>
+
 $ docker container run -p 8080:80 fhsinchy/hello-dock
 Unable to find image 'fhsinchy/hello-dock:latest' locally
 latest: Pulling from fhsinchy/hello-dock
@@ -31,15 +37,19 @@ Digest: sha256:852a90695e942a8aefe5883cb9681a3fbedfdf89f64468e22fa30e04766e5f2e
 Status: Downloaded newer image for fhsinchy/hello-dock:latest
 ```
 
-#### 分离模式
+### 分离模式
 
 ```shell
 $ docker container run --detach -p 8080:80 fhsinchy/hello-dock
 
-#
 $ docker container run -d -p 8080:80 fhsinchy/hello-dock
 32b55add608ab122f170d51aab9394aeed963a9419a4a9c7a3232cf3e79bbca3
 ```
+
+`container run` 命令启动了容器，该命令实际上是两个单独命令的组合。
+
+1. `container create` 命令从给定的镜像创建一个容器。
+2. `container start` 命令将启动一个已经创建的容器。
 
 ```shell
 # 只创建容器
@@ -80,26 +90,40 @@ $ docker run -p 4000:8081  hello-world
 - `-p`: 指定容器的端口
 - `-P`: 随机指定端口
 
-## 查看
+## 查看容器
+
+查看所有正在运行的容器的信息
 
 ```bash
-# 查看正在运行的所有 container 信息
+$ docker container ls
+
 $ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
 33dd05bad49b        a00be011f00a        "nginx -g 'daemon ..."   7 days ago          Up 7 days           0.0.0.0:80->80/tcp   suspicious_yonath
+```
 
-# 查看所有 container ，包括正在运行和已经关闭的
+查看所有容器，包括正在运行和已经关闭的
+
+```shell
 $ docker ps -a
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS                NAMES
 e41187d21e6c        centos              "/bin/bash"              10 minutes ago      Exited (0) 6 minutes ago                        peaceful_austin
+```
 
-# 列出容器的id
+列出正在运行的容器 id
+
+```shell
 $ docker ps -q
 33dd05bad49b
+```
 
-# 查看最后创建的 container
+查看最后创建的容器
+
+```shell
 $ docker ps -l
+```
 
+```shell
 # 输出指定 container 的 stdout 信息（用来看 log ，效果和 tail -f 类似，会实时输出。）
 $ docker logs -f [container]
 
@@ -113,7 +137,7 @@ $ docker top [container]
 $ docker inspect [container]
 ```
 
-查看日志
+## 查看日志
 
 ```shell
 docker logs -tf -tail 10 容器id
@@ -125,70 +149,126 @@ docker logs -tf -tail 10 容器id
 
 查看镜像元数据
 
-## 容器交互模式
+## 交互式模式
 
-进入容器交互模式
+### 以交互式模式运行容器
+
+```shell
+$ docker container run --rm -it ubuntu:12.04
+root@5e5a8941dff5:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  selinux  srv  sys  tmp  usr  var
+```
+
+`-it` 选项提供了与容器内的程序进行交互的场景。此选项实际上是将两个单独的选项混在一起。
+
+- `-i` 或 `--interactive` 连接到容器的输入流，以便可以将输入发送到 bash。
+- `-t` 或 `--tty` 选项可通过分配伪 `tty` 来格式化展示并提供类似本机终端的体验。
+
+### 在容器里执行命令
+
+在 `container run` 命令中，镜像名称后传递的任何内容都将传递到镜像的默认入口里。
+
+```shell
+$ docker run --rm node:8 node -v
+v8.17.0
+```
+
+入口点就像是通往镜像的网关。除可执行镜像外的大多数镜像（在使用可执行镜像小节中说明）使用 shell 或 sh 作为默认入口点。因此，任何有效的 shell 命令都可以作为参数传递给它们。
+
+### 进入容器交互模式
 
 ```bash
 $ docker exec -it <CONTAINER NAME> /bin/bash
 $ docker exec -it <CONTAINER NAME> /bin/sh
 ```
 
-退出容器交互模式
+### 退出容器交互模式
+
+输入 `exit` 命令 或者 按 `Ctrl+P+Q`
 
 ```bash
-exit
-
-# 或者
-
-Ctrl+P+Q
+$ exit
 ```
 
-## 帮助命令
+## 移除容器
 
-```bash
-# 查看docker 版本信息
-docker version
-
-docker info
-```
-
-## 删除
+已被停止或终止的容器仍保留在系统中。这些挂起的容器可能会占用空间或与较新的容器发生冲突。可以使用 `container rm` 命令删除停止的容器。
 
 ```shell
-# 删除指定容器
-docker rm 容器id
+$ docker rm <container identifier>
+$ docker container rm <container identifier>
+```
 
-# 不能删除正在运行的容器
+不能移除正在运行的容器，可以通过 `-f` 强制移除
+
+```shell
 $ docker rm 293413ff8b67
 Error response from daemon: You cannot remove a running container 293413ff8b67f65b4b1b034abc35785f5e3f1376ab1cb20f4cf11934aa526e44. Stop the container before attempting removal or use -f
 
-# 强制删除指定的容器
+# 强制移除指定的容器
 $ docker rm -f 293413ff8b67
 293413ff8b67
 
-# 删除所有的容器
+# 移除所有的容器
 $ docker rm -f $(docker ps -aq)
 $ docker ps -a -q|xargs docker rm
 
-# 删除 container
-$ docker rm [container]
-
 $ docker rm $(docker ps --filter ancestor=ubuntu)
 
-# 删除所有已退出的容器
+
+```
+
+### 移除挂起的容器
+
+已被停止或终止的容器仍保留在系统中。这些挂起的容器可能会占用空间或与较新的容器发生冲突。
+
+可以使用 `container rm` 命令删除停止的容器。通用语法如下：
+
+```shell
+docker container rm <container identifier>
+```
+
+也可以使用 `container prune` 命令来一次性删除所有挂起的容器。
+
+```shell
+$ docker container prune  --force
+
+# 移除所有已退出的容器
 $ docker rm $(docker container ls -f "status=exited" -q)
+```
+
+### 停止后立即被移除
+
+希望容器在停止后立即被移除。
+
+```shell
+docker container run --rm --detach --publish 8888:80 --name hello-dock-volatile fhsinchy/hello-dock
 ```
 
 ## 启动
 
-```shell
-# 启动一个已经停止的 container
-docker start 容器id
+重新启动容器包括以下两种情况
 
-# 重启 container (若 container 处于关闭状态，则直接启动)
+- 重新启动先前已停止或终止的容器。
+- 重新启动正在运行的容器。
+
+启动一个已经停止的 container
+
+```shell
+docker start <container identifier>
+
+docker container start <container identifier>
+```
+
+重启容器 (若 container 处于关闭状态，则直接启动)
+
+```shell
 docker restart 容器id
 ```
+
+这两个命令之间的主要区别在于，`container restart` 命令尝试停止目标容器，然后再次启动它，而 `start` 命令只是启动一个已经停止的容器。
+
+在容器停止的情况下，两个命令完全相同。但是如果容器正在运行，则必须使用`container restart` 命令。
 
 ## 停止
 
@@ -212,22 +292,4 @@ $ docker stop $(docker ps -q)
 
 # 强制停止容器
 $ docker kill [container]
-```
-
-## 移除挂起的容器
-
-已被停止或终止的容器仍保留在系统中。这些挂起的容器可能会占用空间或与较新的容器发生冲突。
-
-可以使用 `container rm` 命令删除停止的容器。通用语法如下：
-
-```shell
-docker container rm <container identifier>
-```
-
-也可以使用 `container prune` 命令来一次性删除所有挂起的容器。
-
-```shell
-docker stop $(docker ps -aq)
-docker rm $(docker ps -aq)
-docker rmi $(docker images -f "dangling=true" -q)
 ```

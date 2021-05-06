@@ -5,32 +5,42 @@ order: 3
 
 Docker 镜像是一个只读的 Docker 容器模板，含有 Docker 容器启动所需的文件系统结构及其内容
 
-## commit 镜像
+## 创建镜像
 
-docker commit 只提交容器镜像发生变更的部分，即修改的后的容器镜像与当前仓库中对应镜像之间的差异部分
+镜像是多层文件，在此文件中，编写的每一行（称为说明）都会为镜像创建一个层。
 
 ```shell
 docker build github.com/creack/docker-firefox
 ```
 
-调用 git clone
+## 标记镜像
 
-## tag
-
-给 image 打 tag
+可以为镜像分配自定义标识符，而不必依赖于随机生成的 ID。如果是镜像，则称为标记而不是命名。在这种情况下，使用 `--tag` 或 `-t` 选项。
 
 ```bash
-$ docker tag [imageId] [imageName]
+$ docker image build --tag <image repository>:<image tag>
 ```
 
-## docker images
+repository 通常指镜像名称，而 tag 指特定的构建或版本。
 
-> [查看镜像列表](https://docs.docker.com/engine/reference/commandline/images/)
+如果在构建期间忘记为镜像添加标记，或者你想更改标记，可以使用 image tag 命令执行此操作
+
+```shell
+$ docker image tag <image id> <image repository>:<image tag>
+
+$ docker image tag <image repository>:<image tag> <new image repository>:<new image tag>
+```
+
+## 列表展示镜像
+
+[查看镜像列表](https://docs.docker.com/engine/reference/commandline/images/)
 
 ```shell
 # docker images [OPTIONS] [REPOSITORY[:TAG]]
 
 # 列出最近创建的镜像
+$ docker image ls
+
 $ docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 nginx               1.15.2-alpine       36f3464a2197        22 months ago       18.6MB
@@ -52,7 +62,7 @@ node                8                   bd2f9f8fa54d        6 months ago        
 $ docker images node:8
 ```
 
-显示格式
+### 显示格式
 
 ```bash
 # 列出未加标签的镜像
@@ -67,7 +77,7 @@ node                8                   sha256:472621a1c5ae598f1f6f128f8a1ed57dc
 nginx               1.15.2-alpine       sha256:23e4dacbc60479fa7f23b3b8e18aad41bd8445706d0538b25ba1d575a6e2410b   36f3464a2197        23 months ago       18.6MB
 ```
 
-格式化输出
+### 格式化输出
 
 ```bash
 $ docker images --format "{{.ID}}: {{.Repository}}"
@@ -79,9 +89,7 @@ bd2f9f8fa54d        node                8
 36f3464a2197        nginx               1.15.2-alpine
 ```
 
-## docker search
-
-搜索镜像
+### 搜索镜像
 
 ```shell
 # 在 registry 中搜索镜像
@@ -91,11 +99,6 @@ $ docker search mysql
 INDEX       NAME                DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
 docker.io   docker.io/mysql     MySQL is a widely used, open-source relati...   9553      [OK]
 docker.io   docker.io/mariadb   MariaDB is a community-developed fork of M...   3471      [OK]
-
-
-
-
-
 
 # 把本地 image 上传到 registry 中 (此时会把所有 tag 都上传上去)
 $ docker push [imageName]
@@ -109,7 +112,42 @@ INDEX       NAME                DESCRIPTION                                     
 docker.io   docker.io/mysql     MySQL is a widely used, open-source relati...   9553      [OK]
 ```
 
-## docker pull
+## 删除镜像
+
+```shell
+docker image rm <image identifier>
+docker rmi <image identifier>
+```
+
+可以使用 image prune 命令来清除所有未标记的挂起的镜像
+
+```shell
+docker image prune --force
+```
+
+`--force` 或 `-f` 选项会跳过所有确认问题。也可以使用 `--all` 或 `-a` 选项删除本地仓库中的所有缓存镜像。
+
+```shell
+# docker rmi [OPTIONS] IMAGE [IMAGE...]
+
+# 删除指定镜像 id
+$ docker rmi -f 镜像id
+
+# 删除多个镜像
+$ docker rmi -f 镜像id 镜像id 镜像id 镜像id
+
+# 删除所有镜像
+$ docker rmi -f $(docker images -aq)
+
+# 删除所有没有 tag 的镜像
+$ docker rmi $(docker images -f "dangling=true" -q)
+```
+
+[删除一个或者多个镜像](https://docs.docker.com/engine/reference/commandline/rmi/)
+
+## 镜像仓库
+
+### 拉取
 
 ```shell
 $ docker pull [OPTIONS] NAME[:TAG|@DIGEST]
@@ -159,24 +197,6 @@ Digest: sha256:d16d9ef7a4ecb29efcd1ba46d5a82bda3c28bd18c0f1e3b86ba54816211e1ac4
 Status: Downloaded newer image for docker.io/mysql:5.7
 ```
 
-## docker rmi
+### 提交镜像
 
-删除镜像
-
-> [删除一个或者多个镜像](https://docs.docker.com/engine/reference/commandline/rmi/)
-
-```shell
-# docker rmi [OPTIONS] IMAGE [IMAGE...]
-
-# 删除指定镜像 id
-$ docker rmi -f 镜像id
-
-# 删除多个镜像
-$ docker rmi -f 镜像id 镜像id 镜像id 镜像id
-
-# 删除所有镜像
-$ docker rmi -f $(docker images -aq)
-
-# 删除所有没有 tag 的镜像
-$ docker rmi $(docker images -f "dangling=true" -q)
-```
+docker commit 只提交容器镜像发生变更的部分，即修改的后的容器镜像与当前仓库中对应镜像之间的差异部分

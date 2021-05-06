@@ -150,3 +150,12 @@ $ sudo yum remove docker-ce docker-ce-cli containerd.io
 ```shell
 $ sudo rm -rf /var/lib/docker
 ```
+
+## 帮助命令
+
+```bash
+# 查看docker 版本信息
+docker version
+
+docker info
+```
