@@ -1,38 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Upload</title>
-</head>
-<body>
-  <form name="user" method="POST" action="http://localhost:3000" enctype="application/x-www-form-urlencoded">
-    <input name="name" />
-    <button type="submit">提交</button>
-  </form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Upload</title>
+  </head>
+  <body>
+    <input type="file" id="file" name="file" />
 
-  <script>
-    const form =  document.forms['user']
+    <script>
+      function request(option) {
+        const { method = 'get', url, data = {} } = option;
+        const xhr = new XMLHttpRequest();
 
-    function onSubmit(event){
-      console.log('event: ', event.target.value);
-      // event.preventDefault()
+        if (option.onProgress && xhr.upload) {
+          xhr.upload.onprogress = function progress(e) {
+            console.log('progress: ', e);
+            if (e.total > 0) {
+              e.percent = (e.loaded / e.total) * 100;
+            }
+            option.onProgress(e);
+          };
+        }
 
-      // const xhr = new XMLHttpRequest()
+        const formData = new FormData();
 
+        for (let key in data) {
+          formData.append(key, data[key]);
+        }
 
-      // xhr.open('POST', 'http://localhost:3000', true)
+        xhr.open(method, url, true);
 
-      // xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded' )
+        xhr.send(formData);
+      }
 
-      // const data = JSON.stringify({name: 'jack'})
+      const fileElement = document.getElementById('file');
 
-      // xhr.send(data)
-    }
-    
-    form.addEventListener('submit', onSubmit, false)
-  </script>
-</body>
+      const onFileChange = e => {
+        console.log('e: ', e.target.files);
+        const file = e.target.files[0];
+        uploadFile(file);
+      };
+
+      const uploadFile = async file => {
+        const onProgress = event => {
+          console.log('onprogress: ', event);
+        };
+
+        request({
+          method: 'post',
+          url: 'http://localhost:3000',
+          onProgress,
+          data: { file },
+        });
+      };
+
+      fileElement.addEventListener('change', onFileChange, false);
+    </script>
+  </body>
 </html>
-

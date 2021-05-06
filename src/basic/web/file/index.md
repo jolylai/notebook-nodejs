@@ -40,4 +40,6 @@ server.listen(3000, () => {
 
 #### Reference
 
-[HTML5 中的 download 属性](https://www.zhangxinxu.com/wordpress/2016/04/know-about-html-download-attribute/)
+- [HTML5 中的 download 属性](https://www.zhangxinxu.com/wordpress/2016/04/know-about-html-download-attribute/)
+- [axios](https://github.com/axios/axios/blob/master/lib/adapters/http.js)
+- [Content-Type](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Content-Type)
