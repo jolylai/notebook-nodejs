@@ -15,7 +15,7 @@ stages:
   - build
   - install
   - deploy
-  - trigger·
+  - trigger
 
 web:echo:
   stage: dump
@@ -54,4 +54,43 @@ web:cd:deploy:aliyun:dev:
     - docker run -v "$(pwd)/deploy":/deploy $ALI_REGISTRY/xacr-basis/xtep-python3 python3 /deploy/dockercdedas.py xrun-frontend
   only:
     - aliyun-dev
+
+web:dist:build:aliyun:prod:
+  stage: build
+  variables:
+    SERVER_URL: https://xrc.321go.com
+    EVN_CONFIG: build:prod
+  before_script:
+    - docker stop $DOCKER_BUILDER_RUNNER && docker rm $DOCKER_BUILDER_RUNNER
+  script:
+    - export TAG=prod
+    - docker build -t $DOCKER_BUILDER_IMAGE --build-arg SERVER_URL=$SERVER_URL --build-arg EVN_CONFIG=build -f ./Dockerfile.build .
+    - docker stop $DOCKER_BUILDER_RUNNER && docker rm $DOCKER_BUILDER_RUNNER
+    - docker run --name $DOCKER_BUILDER_RUNNER $DOCKER_BUILDER_IMAGE /bin/bash
+    - docker cp $DOCKER_BUILDER_RUNNER:/src/app/backup-prod ./docker/dist
+    - docker cp $DOCKER_BUILDER_RUNNER:/src/app/dist ./docker/dist/rm-front-pro
+    - docker build -t $REGISTRY/$WEB_IMAGE:$TAG --build-arg CONT_IMG_VER=prod --pull ./docker
+  only:
+    - /^release(\/|-)?.*$/
+  after_script:
+    - docker stop $DOCKER_BUILDER_RUNNER && docker rm $DOCKER_BUILDER_RUNNER
+
+web:dist:install:aliyun:prod:
+  stage: install
+  before_script:
+    - echo 'push aliyun images'
+  script:
+    - export TAG=prod
+    - export ALI_DOCKER_IMAGE=$ALI_REGISTRY/$ALI_WEB_IMAGE:$CI_BUILD_REF_NAME
+    - docker tag $REGISTRY/$WEB_IMAGE:$TAG $ALI_DOCKER_IMAGE
+    - docker push $ALI_DOCKER_IMAGE
+  only:
+    - /^release(\/|-)?.*$/
+web:cd:deploy:aliyun:prod:
+  stage: deploy
+  script:
+    - docker pull $ALI_REGISTRY/xacr-basis/xtep-python3
+    - docker run -v "$(pwd)/deploy":/deploy $ALI_REGISTRY/xacr-basis/xtep-python3 python3 /deploy/dockercdedas.py xrun-frontend
+  only:
+    - feature-to-aliyun
 ```
