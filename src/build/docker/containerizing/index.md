@@ -1,11 +1,10 @@
 ---
-title: 容器化 JavaScript 应用程序
-order: 2
+title: 容器化 JavaScript 应用
 ---
 
 ## Koa 服务
 
-### Node.js App
+### Node.js 应用
 
 创建 `koa-service` 项目文件夹
 
@@ -63,7 +62,7 @@ CMD [ "node", "index.js" ]
 - **COPY . /app** — 复制应用中所有的文件到镜像中`/app` 文件夹中.
 - **EXPOSE 3000** — 为由这个镜像创建的容器暴露 `3000` 端口，因为我们的应用监听 `3000` 端口，容器默认忽略对所有端口的监听。
 
-### Build Docker Image
+### 创建 Docker 镜像
 
 开启命令行界面，定位到 `koa-service` 文件夹，执行以下命令
 
@@ -121,7 +120,7 @@ REPOSITORY    TAG      IMAGE ID      CREATED         SIZE
 hello-world   latest   c80301fa07b2  22 minutes ago  896MB
 ```
 
-### Run Docker Container
+### 创建 Docker 容器
 
 With our images created we can spin up a container from this image.
 
@@ -278,7 +277,7 @@ $ docker build --rm -f Dockerfile -t docker-react:latest .
  => => naming to docker.io/library/web
 ```
 
-## 创建容器
+### 创建容器
 
 ```bash
 docker run --rm -d -p 80:80 docker-react:latest
