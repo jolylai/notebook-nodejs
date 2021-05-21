@@ -1,7 +1,5 @@
 ---
 title: Nginx
-group:
-  title: 部署
 ---
 
 ## 安装

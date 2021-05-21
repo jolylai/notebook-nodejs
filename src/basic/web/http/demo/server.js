@@ -20,15 +20,18 @@ const getRequestData = req => {
 };
 
 const server = http.createServer(async (req, res) => {
-  console.log(`method ${req.method}`);
-  const data = await getRequestData(req);
-  console.log(`data ${data}`);
+  const { url, method, httpVersion, headers } = req;
+  console.log('req: ', { url, method, httpVersion, headers });
+  // const data = await getRequestData(req);
+  // console.log(`data ${data}`);
 
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
-  res.end('Node.js');
+  res.end('Node.js\n');
 });
 
-server.listen(3001, () => {
-  console.log(`server listen at http://localhost:3001`);
+const PORT = 3000;
+
+server.listen(3000, () => {
+  console.log(`server listen at http://localhost:${PORT}`);
 });

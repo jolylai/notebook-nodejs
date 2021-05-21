@@ -146,3 +146,5 @@ fs.stat('test.txt', function(err, stat) {
   }
 });
 ```
+
+## 判断文件是否存在

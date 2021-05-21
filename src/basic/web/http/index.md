@@ -2,6 +2,37 @@
 title: http
 ---
 
+HTTP 的全称是超文本传输协议，英文写作 HyperText Transfer Protocol。
+
+## 三次握手
+
+```shell
+curl -v http://localhost:3000
+# CP的3次握手过程
+* Rebuilt URL to: http://localhost:3000/
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 3000 (#0)
+
+# 客户端向服务器端发送请求报文
+> GET / HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/7.54.0
+> Accept: */*
+>
+# 服务器端完成处理后，向客户端发送响应内容，包括响应头和响应体
+< HTTP/1.1 200 OK
+< Content-Type: text/plain
+< Date: Fri, 14 May 2021 09:10:05 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+< Content-Length: 8
+<
+Node.js
+# 最后部分是结束会话的信息
+* Connection #0 to host localhost left intact
+```
+
 ## 发送请求
 
 ```js

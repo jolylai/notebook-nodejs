@@ -2,6 +2,8 @@
 title: 模块机制
 group:
   title: 模块
+nav:
+  title: 基础
 ---
 
 ## 前言
