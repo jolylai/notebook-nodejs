@@ -1,16 +1,8 @@
 ---
-title: Rollup 打包
+title: Rollup
 ---
 
-##
-
-```json
-{
-  "main": "dist/cjs.js",
-  "module": "dist/esm-bundler.js",
-  "unpkg": "dist/global.js"
-}
-```
+## 前言
 
 ```shell
 yarn add rollup -D
@@ -31,6 +23,160 @@ Automatically externalize peerDependencies in a rollup bundle.
 
 [rollup-plugin-terser](https://github.com/TrySound/rollup-plugin-terser)
 代码压缩插件
+
+## 初始化
+
+```bash
+yarn add rollup -D
+```
+
+创建 `rollup.config.js`
+
+```js
+import { name } from './package.json';
+
+export default {
+  input: './packages/index.ts',
+  output: [{ format: 'es', file: `dist/${name}.esm.js` }],
+};
+```
+
+修改 `pckgage.json` 的 `script` 执行命令
+
+```json
+{
+  "main": "dist/cjs.js",
+  "module": "dist/esm-bundler.js",
+  "unpkg": "dist/global.js",
+  "scripts": {
+    "start": "rollup -cw",
+    "build": "rollup -c"
+  }
+}
+```
+
+## typescript
+
+```shell
+yarn add typescript rollup-plugin-typescript2 -D
+```
+
+更改 `rollup.config.js` 配置：
+
+```js
+import typescript from 'rollup-plugin-typescript2';
+
+export default {
+  input: './src/main.ts',
+  plugins: [
+    typescript({
+      useTsconfigDeclarationDir: true,
+    }),
+  ],
+};
+```
+
+这里配置 useTsconfigDeclarationDir 表示使用根目录的 tsconfig.json 文件作为 typescript 编译配置文件。
+
+创建并配置 tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "es2015",
+    "lib": ["es2015", "es2016", "es2017", "dom"],
+    "strict": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "dist/types",
+    "typeRoots": ["node_modules/@types"]
+  }
+}
+```
+
+## 代码压缩
+
+```shell
+yarn add rollup-plugin-terser
+```
+
+修改 `pckgage.json`
+
+```js
+import { terser } from 'rollup-plugin-terser';
+
+export default {
+  plugins: [terser()],
+};
+```
+
+## 转换 Commonjs
+
+```shell
+yarn add rollup-plugin-commonjs -D
+```
+
+修改 rollup 配置文件
+
+```js
+// rollup.config.js
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+
+export default {
+  external: [],
+  plugins: [resolve(), commonjs()],
+};
+```
+
+## babel
+
+```shell
+yarn add @rollup/plugin-babel @babel/core -D
+```
+
+修改 rollup 配置文件
+
+```js
+// rollup.config.js
+
+import babel from '@rollup/plugin-babel';
+
+export default {
+  plugins: [
+    babel({
+      exclude: 'node_modules/**',
+      extensions: ['.js', '.jsx', '.vue'],
+      babelHelpers: 'bundled',
+    }),
+  ],
+};
+```
+
+**babelHelpers**
+配置 helpers 以何种方式插入到代码中 'bundled' | 'runtime' | 'inline' | 'external'
+
+## vue
+
+```
+yarn add @vue/compiler-sfc rollup-plugin-vue
+```
+
+修改 rollup 配置文件
+
+```js
+// rollup.config.js
+import vuePlugin from 'rollup-plugin-vue';
+
+export default {
+  plugins: [
+    vuePlugin({
+      css: true,
+    }),
+  ],
+};
+```
 
 ## 配置文件
 
